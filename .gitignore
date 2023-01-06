@@ -1,0 +1,9 @@
+*.py[cod]
+.idea
+test.py
+.DS_Store
+.vscode
+# C extensions
+*.so
+__pycache__
+*.log
