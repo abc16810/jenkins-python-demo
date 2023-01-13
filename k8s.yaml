@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-python-demo
+  name: fastapi
+spec:
+  selector:
+    matchLabels:
+      app: my-python-demo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-python-demo
+    spec:
+      containers:
+      - name: fastapi
+        image: myregistry.io:8088/library/my-python-demo:<BUILD_TAGS>
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
