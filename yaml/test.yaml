@@ -1,0 +1,45 @@
+# podTemplate步骤定义了一个临时pod模板。
+# 它是在管道执行时在podTemplate块中创建的。之后会立即删除。这样的pod模板不打算与Jenkins实例中的其他构建或项目共享
+podTemplate(yaml: '''
+              apiVersion: v1
+              kind: Pod
+              spec:
+                containers:
+                - name: busybox
+                  image: busybox:1.28.4
+                  command:
+                  - sleep
+                  args:
+                  - 99d
+                  volumeMounts:
+                  - name: dockersock
+                    mountPath: /var/run/docker.sock
+                - name: "inbound-agent"
+                  image: "jenkins/inbound-agent:jdk11"
+                  imagePullPolicy: "IfNotPresent"
+                  name: "jnlp"
+                  resources:
+                    requests:
+                      cpu: "100m"
+                      memory: "256Mi"
+                nodeSelector:
+                  kubernetes.io/hostname: "utility1"
+                tolerations:
+                - effect: "NoSchedule"
+                  operator: "Exists"
+                volumes:
+                - name: dockersock
+                  hostPath:
+                    path: /var/run/docker.sock
+''') {
+  node(POD_LABEL) {    # 生成的唯一标签pod模板
+    stage('Run shell') {
+        sh "echo hello world"
+          }
+    stage('Build Docker image') {
+      container('busybox') {
+        sh "echo hello from $POD_CONTAINER"    # POD_CONTAINER变量
+      }
+    }
+  }
+}

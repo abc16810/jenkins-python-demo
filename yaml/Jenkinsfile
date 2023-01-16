@@ -1,0 +1,12 @@
+podTemplate(yaml: readTrusted('pod.yaml')) {
+  node(POD_LABEL) {   
+    stage('Run shell') {
+        sh "echo hello world"
+          }
+    stage('Build Docker image') {
+      container('busybox') {
+        sh "echo hello from $POD_CONTAINER"
+      }
+    }
+  }
+}

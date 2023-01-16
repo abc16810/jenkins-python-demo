@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.28.4
+    command:
+    - sleep
+    args:
+    - 99d
+    volumeMounts:
+    - name: dockersock
+      mountPath: /var/run/docker.sock
+  - name: "inbound-agent"
+    image: "jenkins/inbound-agent:jdk11"
+    imagePullPolicy: "IfNotPresent"
+    name: "jnlp"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+  nodeSelector:
+    kubernetes.io/hostname: "utility1"
+  tolerations:
+  - effect: "NoSchedule"
+    operator: "Exists"
+  volumes:
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
