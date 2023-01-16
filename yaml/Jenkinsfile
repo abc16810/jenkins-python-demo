@@ -1,4 +1,4 @@
-podTemplate(yaml: readTrusted('pod.yaml')) {
+podTemplate(yaml: readTrusted('yaml/pod.yaml')) {
   node(POD_LABEL) {   
     stage('Run shell') {
         sh "echo hello world"
