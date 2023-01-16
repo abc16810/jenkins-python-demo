@@ -2,7 +2,6 @@ node('inbound') {
     stage('Prepare') {
         echo "1.Prepare Stage"
         pwd
-        id
         script {
             build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
             }
