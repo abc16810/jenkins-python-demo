@@ -33,9 +33,6 @@ spec:
   - effect: "NoSchedule"
     operator: "Exists"
   volumes:
-  - name: dockersock
-    hostPath:
-      path: /var/run/docker.sock
   - hostPath:
       path: "/run/containerd/containerd.sock"
     name: "containerd"
