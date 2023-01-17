@@ -23,10 +23,6 @@ spec:
       requests:
         cpu: "100m"
         memory: "256Mi"
-  hostAliases:
-  - hostnames:
-    - "myregistry.io"
-    ip: "10.4.55.209"
   nodeSelector:
     kubernetes.io/hostname: "utility1"
   tolerations:
