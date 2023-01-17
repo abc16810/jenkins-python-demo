@@ -12,7 +12,7 @@ spec:
     - name: dockersock
       mountPath: /var/run/docker.sock
     - name: workspace-jenkins
-      mountPath: "/home/jenkins/agent"
+      mountPath: /var/jenkins/workspace
       readOnly: false
   - name: "inbound-agent"
     image: "jenkins/inbound-agent:jdk11"
@@ -23,7 +23,7 @@ spec:
         cpu: "100m"
         memory: "256Mi"
     volumeMounts:
-    - mountPath: "/home/jenkins/agent"
+    - mountPath: /var/jenkins/workspace
       name: "workspace-jenkins"
       readOnly: false
   nodeSelector:
