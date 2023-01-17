@@ -11,9 +11,6 @@ spec:
     volumeMounts:
     - name: dockersock
       mountPath: /var/run/docker.sock
-    - name: workspace-jenkins
-      mountPath: /var/jenkins/workspace
-      readOnly: false
   - name: "inbound-agent"
     image: "jenkins/inbound-agent:jdk11"
     imagePullPolicy: "IfNotPresent"
@@ -22,10 +19,6 @@ spec:
       requests:
         cpu: "100m"
         memory: "256Mi"
-    volumeMounts:
-    - mountPath: /var/jenkins/workspace
-      name: "workspace-jenkins"
-      readOnly: false
   nodeSelector:
     kubernetes.io/hostname: "utility1"
   tolerations:
@@ -35,6 +28,3 @@ spec:
   - name: dockersock
     hostPath:
       path: /var/run/docker.sock
-  - name: workspace-jenkins
-    hostPath:
-      path: /home/jenkins/test

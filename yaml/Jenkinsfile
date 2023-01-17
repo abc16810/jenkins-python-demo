@@ -22,7 +22,7 @@ pipeline {
     kubernetes {
       cloud 'kubernetes'
       slaveConnectTimeout 1200
-      workspaceVolume hostPathWorkspaceVolume(hostPath: "/home/jenkins/test", readOnly: false)
+      workspaceVolume hostPathWorkspaceVolume(hostPath: "/home/jenkins/agent", readOnly: false)   //持久化
       yamlFile 'yaml/pod.yaml'
     }
   }
