@@ -45,8 +45,17 @@ pipeline {
     stage('Build') {
       steps{
         echo "3.Build Docker Image Stage"
+        withCredentials([usernamePassword(credentialsId: 'DockerAuth', usernameVariable: 'DockerAuthUser', passwordVariable: 'DockerAuthPassword')]) {
+        sh '''
+          set +x
+          update-ca-certificates
+          nerdctl login -u ${DockerAuthUser} -p ${DockerAuthPassword}  myregistry.io:8088
+        '''
+        sh "nerdctl build  -t myregistry.io:8088/library/my-python-demo:${build_tag} ."
+        sh "nerdctl push myregistry.io:8088/library/my-python-demo:${build_tag}"
+        }
+       
       }
       
     }
-  }
 }

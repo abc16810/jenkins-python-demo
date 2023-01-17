@@ -2,15 +2,19 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: busybox
-    image: busybox:1.28.4
-    command:
-    - sleep
-    args:
-    - 99d
+  - name: nerdctl-client
+    image: nerdctl:v1
+    imagePullPolicy: IfNotPresent
     volumeMounts:
-    - name: dockersock
-      mountPath: /var/run/docker.sock
+    - mountPath: "/usr/local/share/ca-certificates"
+      name: "ca"
+      readOnly: false
+    - mountPath: "/run/containerd/containerd.sock"
+      name: "containerd"
+      readOnly: false
+    - mountPath: "/run/buildkit/buildkitd.sock"
+      name: "buildkitd"
+      readOnly: false
   - name: "inbound-agent"
     image: "jenkins/inbound-agent:jdk11"
     imagePullPolicy: "IfNotPresent"
@@ -19,6 +23,10 @@ spec:
       requests:
         cpu: "100m"
         memory: "256Mi"
+  hostAliases:
+  - hostnames:
+    - "myregistry.io"
+    ip: "10.4.55.209"
   nodeSelector:
     kubernetes.io/hostname: "utility1"
   tolerations:
@@ -28,3 +36,13 @@ spec:
   - name: dockersock
     hostPath:
       path: /var/run/docker.sock
+  - hostPath:
+      path: "/run/containerd/containerd.sock"
+    name: "containerd"
+  - name: "ca"
+    secret:
+      optional: false
+      secretName: "docker-ca"
+  - hostPath:
+      path: "/run/buildkit/buildkitd.sock"
+    name: "buildkitd"
