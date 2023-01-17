@@ -22,19 +22,31 @@ pipeline {
     kubernetes {
       cloud 'kubernetes'
       slaveConnectTimeout 1200
+      //inheritFrom 'mypod' // 指定pod 模板, 如果不指定可以通过yamlfile指定文件
       workspaceVolume hostPathWorkspaceVolume(hostPath: "/home/jenkins/agent", readOnly: false)   //持久化
       yamlFile 'yaml/pod.yaml'
     }
   }
   stages {
-    stage('Run shell') {
+    stage('Prepare') {
       steps {
-        sh "echo hello world"
-        sh "pwd && ls -l ./"
+        echo "1.Prepare Stage"
         script {
             build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
             }
+        echo "${build_tag}"
       }
+    }
+    stage('Test') {
+      steps{
+        echo "2.Test Stage"
+      }
+    }
+    stage('Build') {
+      steps{
+        echo "3.Build Docker Image Stage"
+      }
+      
     }
   }
 }
