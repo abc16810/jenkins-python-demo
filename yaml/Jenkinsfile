@@ -3,11 +3,15 @@ podTemplate(yaml: readTrusted('yaml/pod.yaml')) {
     stage('Run shell') {
         sh "echo hello world"
         sh "pwd && ls -l ./"
+        script {
+            build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+            }
           }
     stage('Build Docker image') {
       container('busybox') {
         sh "echo hello from $POD_CONTAINER"
         sh "pwd && ls -l ./"
+        echo "${build_tag}"
       }
     }
   }
