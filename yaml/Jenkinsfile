@@ -20,7 +20,7 @@
 pipeline {
   agent {
     kubernetes {
-      workspaceVolume hostPathWorkspaceVolume(hostPath: "/data/jenkins/workspace", readOnly: false)
+      workspaceVolume hostPathWorkspaceVolume(hostPath: "/home/jenkins/test", readOnly: false)
       yamlFile 'yaml/pod.yaml'
     }
   }
