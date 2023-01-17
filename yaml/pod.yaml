@@ -2,9 +2,9 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: nerdctl-client
-    image: nerdctl:v1
-    imagePullPolicy: IfNotPresent
+  - name: "nerdctl-client"
+    image: "nerdctl:v1"
+    imagePullPolicy: "IfNotPresent"
     # volumeMounts:
     # - mountPath: "/usr/local/share/ca-certificates"
     #   name: "ca"
