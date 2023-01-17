@@ -20,6 +20,8 @@
 pipeline {
   agent {
     kubernetes {
+      cloud 'kubernetes'
+      slaveConnectTimeout 1200
       workspaceVolume hostPathWorkspaceVolume(hostPath: "/home/jenkins/test", readOnly: false)
       yamlFile 'yaml/pod.yaml'
     }
