@@ -8,13 +8,13 @@ spec:
     volumeMounts:
     - mountPath: "/usr/local/share/ca-certificates"
       name: "ca"
-      readOnly: false
+      readOnly: true
     - mountPath: "/run/containerd/containerd.sock"
       name: "containerd"
-      readOnly: false
+      readOnly: true
     - mountPath: "/run/buildkit/buildkitd.sock"
       name: "buildkitd"
-      readOnly: false
+      readOnly: true
   - name: "inbound-agent"
     image: "jenkins/inbound-agent:jdk11"
     imagePullPolicy: "IfNotPresent"
