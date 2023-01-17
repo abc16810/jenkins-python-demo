@@ -5,16 +5,16 @@ spec:
   - name: nerdctl-client
     image: nerdctl:v1
     imagePullPolicy: IfNotPresent
-    volumeMounts:
-    - mountPath: "/usr/local/share/ca-certificates"
-      name: "ca"
-      readOnly: true
-    - mountPath: "/run/containerd/containerd.sock"
-      name: "containerd"
-      readOnly: true
-    - mountPath: "/run/buildkit/buildkitd.sock"
-      name: "buildkitd"
-      readOnly: true
+    # volumeMounts:
+    # - mountPath: "/usr/local/share/ca-certificates"
+    #   name: "ca"
+    #   readOnly: true
+    # - mountPath: "/run/containerd/containerd.sock"
+    #   name: "containerd"
+    #   readOnly: true
+    # - mountPath: "/run/buildkit/buildkitd.sock"
+    #   name: "buildkitd"
+    #   readOnly: true
   - name: "inbound-agent"
     image: "jenkins/inbound-agent:jdk11"
     imagePullPolicy: "IfNotPresent"
@@ -32,14 +32,14 @@ spec:
   tolerations:
   - effect: "NoSchedule"
     operator: "Exists"
-  volumes:
-  - hostPath:
-      path: "/run/containerd/containerd.sock"
-    name: "containerd"
-  - name: "ca"
-    secret:
-      optional: false
-      secretName: "docker-ca"
-  - hostPath:
-      path: "/run/buildkit/buildkitd.sock"
-    name: "buildkitd"
+  # volumes:
+  # - hostPath:
+  #     path: "/run/containerd/containerd.sock"
+  #   name: "containerd"
+  # - name: "ca"
+  #   secret:
+  #     optional: false
+  #     secretName: "docker-ca"
+  # - hostPath:
+  #     path: "/run/buildkit/buildkitd.sock"
+  #   name: "buildkitd"
