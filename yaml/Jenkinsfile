@@ -98,9 +98,8 @@ pipeline {
       }
       steps {
         container('kubectl') {
-          sh """
-            kubectl get pod 
-          """
+          echo "1111"
+          sh "kubectl get pod"
         }
       }
     }
