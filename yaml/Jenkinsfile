@@ -33,29 +33,44 @@ pipeline {
     }
   parameters {
     gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'Name', type: 'PT_BRANCH'  //Name git 参数名称
+    choice(
+      name: 'ACTION',  //ACTION 选择参数名称
+      description: '执行动作: \nbuild: 只构建镜像，不发布\ndeploy: 构建镜像并发布更新到开发环境',
+      choices: ['deploy','build']
+    )
   }
   stages {
     stage('Prepare') {
       steps {
-        echo "${params.Name}"
-        echo "${BUILD_TAG}"
+        println "开始对分支 ${params.Name} 进行构建"
       }
     }
-    stage("Pulling Code by trigger"){
-      steps{
-          sh '''
-          pwd && id
-          '''
-          //检出代码
-          git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
-          script {
-              COMMIT_ID = sh(
-                returnStdout: true,
-                script: "git log -n 1 --pretty=format:'%h'"
-              ).trim()
-              TAG = BUILD_TAG + '-' + COMMIT_ID
-              println "Current branch is ${params.Name}, Commit ID is ${COMMIT_ID}, Image TAG is ${TAG}"
-            }
+    stage("Pulling Code"){
+      parallel {
+        stage("Pulling Code by Jenkins"){
+          steps{
+              // sh '''
+              // pwd && id
+              // '''
+              //检出代码
+              git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
+              script {
+                  COMMIT_ID = sh(
+                    returnStdout: true,
+                    script: "git log -n 1 --pretty=format:'%h'"
+                  ).trim()
+                  TAG = BUILD_TAG + '-' + COMMIT_ID
+                  println "Current branch is ${params.Name}, Commit ID is ${COMMIT_ID}, Image TAG is ${TAG}"
+                }
+          }
+        }
+        stage('Branch B') {
+          steps {
+                        echo "On Branch B"
+                        sh "pwd && ls -l"
+                    }
+        }
+
       }
     }
   }
