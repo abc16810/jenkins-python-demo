@@ -24,8 +24,9 @@ spec:
     image: "myregistry.io:8088/library/kubectl:1.25"
     imagePullPolicy: "IfNotPresent"
     command:
-    - "cat"
-    tty: true
+      - sleep
+    args:
+      - 99d
     volumeMounts:
     - mountPath: "/.kube/config"
       name: "config"
