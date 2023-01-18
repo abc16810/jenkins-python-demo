@@ -99,6 +99,12 @@ pipeline {
       steps {
         container('kubectl') {
           echo "1111"
+          sh '''
+          #!/bin/sh
+          set +x
+          echo 1111
+          '''
+          sh "echo 'hello';"
           sh "kubectl get pod"
         }
       }
