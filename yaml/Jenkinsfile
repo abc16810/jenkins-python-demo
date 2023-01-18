@@ -30,11 +30,15 @@ pipeline {
   environment { 
         CC = 'clang'
     }
+  parameters {
+    gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'Name', type: 'PT_BRANCH'
+  }
   stages {
     stage('Prepare') {
       steps {
         echo "${CC}"
         echo "${Name}"
+        echo "${params.Name}"
         sh "pwd && id"
       }
     }
