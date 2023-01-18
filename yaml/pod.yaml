@@ -20,7 +20,16 @@ spec:
       name: "buildkitd"
       readOnly: true
     workingDir: "/home/jenkins/agent"
-
+  - name: kubectl
+    image: "myregistry.io:8088/library/kubectl:1.25"
+    imagePullPolicy: "IfNotPresent"
+    command:
+    - "cat"
+    tty: true
+    volumeMounts:
+    - mountPath: "/.kube/config"
+      name: "config"
+      readOnly: true
   - name: "inbound-agent"
     image: "jenkins/inbound-agent:jdk11"
     imagePullPolicy: "IfNotPresent"
@@ -49,3 +58,6 @@ spec:
   - hostPath:
       path: "/run/buildkit/buildkitd.sock"
     name: "buildkitd"
+  - hostPath:
+      path: "/home/jenkins/config"
+    name: "config"

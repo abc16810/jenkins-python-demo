@@ -92,6 +92,18 @@ pipeline {
         }
       }
     }
+    stage('Deploying to K8s') {
+      when {
+        expression { params.ACTION == 'deploy' }
+      }
+      steps {
+        container('kubectl') {
+          sh """
+            kubectl get pod 
+          """
+        }
+      }
+    }
   }
     
 }
