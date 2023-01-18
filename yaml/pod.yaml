@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: "nerdctl-client"
+  - name: "nerdctl"
     image: "nerdctl:v1"
     imagePullPolicy: "IfNotPresent"
     # volumeMounts:
