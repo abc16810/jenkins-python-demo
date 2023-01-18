@@ -47,7 +47,7 @@ pipeline {
           sh '''
           pwd && id
           '''
-          git branch: "${params.Name}", credentialsId: 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667', url: 'http://10.4.56.155/ops/k8s.git'
+          git branch: 'master', credentialsId: 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667', url: 'http://10.4.56.155/ops/k8s.git'
           script {
               COMMIT_ID = sh(
                 returnStdout: true,
