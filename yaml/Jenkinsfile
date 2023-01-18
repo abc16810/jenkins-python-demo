@@ -49,6 +49,7 @@ pipeline {
         sh '''
           set +x
           update-ca-certificates
+          git branch
           nerdctl login -u ${DockerAuthUser} -p ${DockerAuthPassword}  myregistry.io:8088
         '''
         sh "nerdctl build  -t myregistry.io:8088/library/my-python-demo:${build_tag} ."
