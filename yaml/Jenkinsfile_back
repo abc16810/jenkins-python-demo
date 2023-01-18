@@ -27,16 +27,37 @@ pipeline {
       yamlFile 'yaml/pod.yaml'
     }
   }
-  environment { 
-        CC = 'clang'
-    }
   stages {
     stage('Prepare') {
       steps {
-        echo "${CC}"
-        echo "${Name}"
+        echo "1.Prepare Stage"
+        script {
+            build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+            }
+        echo "${build_tag}"
       }
     }
+    stage('Test') {
+      steps{
+        echo "2.Test Stage"
+      }
+    }
+    stage('Build') {
+      steps{
+        echo "3.Build Docker Image Stage"
+        withCredentials([usernamePassword(credentialsId: 'DockerAuth', usernameVariable: 'DockerAuthUser', passwordVariable: 'DockerAuthPassword')]) {
+        sh '''
+          set +x
+          update-ca-certificates
+          git branch
+          nerdctl login -u ${DockerAuthUser} -p ${DockerAuthPassword}  myregistry.io:8088
+        '''
+        sh "nerdctl build  -t myregistry.io:8088/library/my-python-demo:${build_tag} ."
+        sh "nerdctl push myregistry.io:8088/library/my-python-demo:${build_tag}"
+        }
+       
+      }
+      
+    }
   }
-    
 }
