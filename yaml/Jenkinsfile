@@ -39,9 +39,20 @@ pipeline {
         echo "${CC}"
         echo "${Name}"
         echo "${params.Name}"
-        sh "pwd && id"
       }
     }
+    stage("pull"){
+      steps{
+          sh '''
+          pwd && id
+          mkdir project && cd project
+          '''
+          git branch: "${params.Name}", credentialsId: 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667', url: 'http://10.4.56.155/ops/jenkins-python-demo.git'
+      }
+      
+
+    }
+
   }
     
 }
