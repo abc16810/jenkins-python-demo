@@ -30,6 +30,9 @@ pipeline {
   environment { 
         REPO_HTTP = 'http://10.4.56.155/ops/k8s.git'
         GIT_AUTH_ID = 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667'
+        HARBOR_ADDRESS = 'myregistry.io:8088'
+        HARBOR_AUTH = credentials('harborAuth')
+        IMAGE_NAME = 'my-python-demo'
     }
   parameters {
     gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'Name', type: 'PT_BRANCH'  //Name git 参数名称
@@ -59,18 +62,24 @@ pipeline {
                     returnStdout: true,
                     script: "git log -n 1 --pretty=format:'%h'"
                   ).trim()
-                  TAG = BUILD_TAG + '-' + COMMIT_ID
+                  TAG = "${params.Name}" + '-' + COMMIT_ID
                   println "Current branch is ${params.Name}, Commit ID is ${COMMIT_ID}, Image TAG is ${TAG}"
                 }
           }
         }
-        stage('Branch B') {
-          steps {
-                        echo "On Branch B"
-                        sh "pwd && ls -l"
-                    }
+      }
+    }
+    stage("build"){
+      steps {
+        container('nerdctl') {   //指定容器
+          sh '''
+          set +x
+          update-ca-certificates
+          nerdctl login -u ${HARBOR_AUTH_USR} -p ${HARBOR_AUTH_PSW}  ${HARBOR_ADDRESS}
+          '''
+          sh "nerdctl build  -t ${HARBOR_ADDRESS}library/${IMAGE_NAME}:${TAG} ."
+          sh "nerdctl push ${HARBOR_ADDRESS}/library/${IMAGE_NAME}:${TAG}"
         }
-
       }
     }
   }
