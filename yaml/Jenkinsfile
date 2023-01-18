@@ -39,15 +39,23 @@ pipeline {
         echo "${CC}"
         echo "${Name}"
         echo "${params.Name}"
+        echo "${BUILD_TAG}"
       }
     }
-    stage("pull"){
+    stage("Pulling Code by trigger"){
       steps{
           sh '''
           pwd && id
-          mkdir project && cd project
           '''
-          git branch: "${params.Name}", credentialsId: 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667', url: 'http://10.4.56.155/ops/jenkins-python-demo.git'
+          git branch: "${params.Name}", credentialsId: 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667', url: 'http://10.4.56.155/ops/k8s.git'
+          script {
+              COMMIT_ID = sh(
+                returnStdout: true,
+                script: "git log -n 1 --pretty=format:'%h'"
+              ).trim()
+              TAG = BUILD_TAG + '-' + COMMIT_ID
+              println "Current branch is ${env.gitlabBranch}, Commit ID is ${COMMIT_ID}"
+            }
       }
       
 
