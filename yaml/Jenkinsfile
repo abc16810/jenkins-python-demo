@@ -22,23 +22,21 @@ pipeline {
     kubernetes {
       cloud 'kubernetes'
       slaveConnectTimeout 1200
-      customWorkspace '/home/jenkins/agent/test'
       //inheritFrom 'mypod' // 指定pod 模板, 如果不指定可以通过yamlfile指定文件
-      workspaceVolume hostPathWorkspaceVolume(hostPath: "/home/jenkins/agent", readOnly: false)   //持久化
+      workspaceVolume hostPathWorkspaceVolume(hostPath: "/home/jenkins/agent", readOnly: false)   //持久化本地目录
       yamlFile 'yaml/pod.yaml'
     }
   }
   environment { 
-        CC = 'clang'
+        REPO_HTTP = 'http://10.4.56.155/ops/k8s.git'
+        GIT_AUTH_ID = 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667'
     }
   parameters {
-    gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'Name', type: 'PT_BRANCH'
+    gitParameter branchFilter: 'origin/(.*)', defaultValue: 'master', name: 'Name', type: 'PT_BRANCH'  //Name git 参数名称
   }
   stages {
     stage('Prepare') {
       steps {
-        echo "${CC}"
-        echo "${Name}"
         echo "${params.Name}"
         echo "${BUILD_TAG}"
       }
@@ -48,19 +46,18 @@ pipeline {
           sh '''
           pwd && id
           '''
+          //检出代码
+          git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
           script {
               COMMIT_ID = sh(
                 returnStdout: true,
                 script: "git log -n 1 --pretty=format:'%h'"
               ).trim()
               TAG = BUILD_TAG + '-' + COMMIT_ID
-              println "Current branch is ${Name}, Commit ID is ${COMMIT_ID}"
+              println "Current branch is ${params.Name}, Commit ID is ${COMMIT_ID}, Image TAG is ${TAG}"
             }
       }
-      
-
     }
-
   }
     
 }
