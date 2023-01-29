@@ -16,6 +16,9 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: "utility1"
+      tolerations:
+       - effect: NoSchedule
+         operator: Exists
       containers:
       - name: fastapi
         image: myregistry.io:8088/library/my-python-demo:<BUILD_TAGS>
