@@ -14,6 +14,8 @@ spec:
       labels:
         app: my-python-demo
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: "utility1"
       containers:
       - name: fastapi
         image: myregistry.io:8088/library/my-python-demo:<BUILD_TAGS>
