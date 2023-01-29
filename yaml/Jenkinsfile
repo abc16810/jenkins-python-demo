@@ -57,7 +57,6 @@ pipeline {
               // '''
               //检出指定分支代码
               git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
-              sh "pwd && ls -l"
               script {
                   COMMIT_ID = sh(
                     returnStdout: true,
@@ -106,7 +105,10 @@ pipeline {
         stage("Deployment to prod"){
           when { 
             beforeInput true
-            anyOf { branch 'master'; branch 'main' } 
+            anyOf {
+              environment name: 'params.Name', value: 'main'
+              environment name: 'params.Name', value: 'master'
+            } 
           }
           input {
                 message "Deploy to production?"
