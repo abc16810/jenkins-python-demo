@@ -106,8 +106,8 @@ pipeline {
           when { 
             beforeInput true
             anyOf {
-              environment name: 'params.Name', value: 'main'
-              environment name: 'params.Name', value: 'master'
+              expression { params.Name == 'main' }
+              expression { params.Name == 'master' }
             } 
           }
           input {
