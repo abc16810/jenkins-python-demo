@@ -57,6 +57,7 @@ pipeline {
               // '''
               //检出代码
               git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
+              sh "pwd && ls -l"
               script {
                   COMMIT_ID = sh(
                     returnStdout: true,
