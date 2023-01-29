@@ -101,8 +101,9 @@ pipeline {
         container('kubectl') {
           echo "1111"
           sh '''
-          #!/bin/sh
           set +x
+          id && pwd
+          sleep 9999
           echo 1111
           '''
           sh "echo 'hello';"
