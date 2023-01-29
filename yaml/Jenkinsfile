@@ -76,10 +76,14 @@ pipeline {
       steps {
         container(name: 'jnlp') {
           sh "java -version"
+          echo "无需编译"
         }
       }
     }
     stage("Docker build for creating image"){
+      when {
+        expression { params.ACTION ==~ /(build|deploy)/ }
+      }
       steps {
         container('nerdctl') {   //指定容器
           sh '''
@@ -100,6 +104,8 @@ pipeline {
       steps {
         container('kubectl') {
           sh "sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml"   //更新镜像tag
+          echo "${env.BRANCH_NAME}"
+          echo "${BRANCH_NAME}"
           sh '''
           set +x
           id && pwd
