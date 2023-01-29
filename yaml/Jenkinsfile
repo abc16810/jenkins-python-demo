@@ -28,7 +28,7 @@ pipeline {
     }
   }
   environment { 
-        REPO_HTTP = 'http://10.4.56.155/ops/k8s.git'
+        REPO_HTTP = 'http://10.4.56.155/ops/jenkins-python-demo.git'
         GIT_AUTH_ID = 'ea2f709f-9cac-4978-aeb2-9fc37e8e9667'
         HARBOR_ADDRESS = 'myregistry.io:8088'
         HARBOR_AUTH = credentials('harborAuth')
@@ -55,7 +55,7 @@ pipeline {
               // sh '''
               // pwd && id
               // '''
-              //检出代码
+              //检出指定分支代码
               git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
               sh "pwd && ls -l"
               script {
