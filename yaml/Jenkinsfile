@@ -43,115 +43,124 @@ pipeline {
     )
   }
   stages {
-    stage('Prepare') {
-      steps {
-        println "开始对分支 ${params.Name} 进行构建"
-      }
-    }
-    stage("Pulling Code"){
-      parallel {
-        stage("Pulling Code by Jenkins"){
-          steps{
-              // sh '''
-              // pwd && id
-              // '''
-              //检出指定分支代码
-              git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
-              script {
-                  COMMIT_ID = sh(
-                    returnStdout: true,
-                    script: "git log -n 1 --pretty=format:'%h'"
-                  ).trim()
-                  TAG = "${params.Name}" + '-' + COMMIT_ID
-                  println "Current branch is ${params.Name}, Commit ID is ${COMMIT_ID}, Image TAG is ${TAG}"
-                }
-          }
+    gitlabCommitStatus('aaa') {
+      stage('Prepare') {
+        steps {
+          println "开始对分支 ${params.Name} 进行构建"
         }
       }
-    }
-    stage('Building') {
-      when {
-        expression { params.ACTION ==~ /(build|deploy)/ }
-      }
-      steps {
-        container(name: 'jnlp') {
-          sh "java -version"
-          echo "无需编译"
-        }
-      }
-    }
-    stage("Docker build for creating image"){
-      when {
-        expression { params.ACTION ==~ /(build|deploy)/ }
-      }
-      steps {
-        container('nerdctl') {   //指定容器
-          sh '''
-          set +x
-          id && pwd
-          update-ca-certificates
-          nerdctl login -u ${HARBOR_AUTH_USR} -p ${HARBOR_AUTH_PSW}  ${HARBOR_ADDRESS}
-          '''
-          sh "nerdctl build  -t ${HARBOR_ADDRESS}/library/${IMAGE_NAME}:${TAG} ."
-          sh "nerdctl push ${HARBOR_ADDRESS}/library/${IMAGE_NAME}:${TAG}"
-        }
-      }
-    }
-    stage('Deploying to K8s') {
-      when {
-        expression { params.ACTION == 'deploy' }
-      }
-      parallel {
-        stage("Deployment to prod"){
-          when { 
-            beforeInput true
-            anyOf {
-              expression { params.Name == 'main' }
-              expression { params.Name == 'master' }
-            } 
-          }
-          input {
-                message "Deploy to production?"
-                ok "Yes, we should."
-                id "simple-input"
-          }
-          steps {
-            container('kubectl') {
-              sh "sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml"   //更新镜像tag
-              sh '''
-              set +x
-              id && pwd
-              PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
-              kubectl get pod
-              kubectl apply -f k8s.yaml
-              '''
+      stage("Pulling Code"){
+        parallel {
+          stage("Pulling Code by Jenkins"){
+            steps{
+                // sh '''
+                // pwd && id
+                // '''
+                //检出指定分支代码
+                git branch: "${params.Name}", credentialsId: "${GIT_AUTH_ID}", url: "${REPO_HTTP}"
+                script {
+                    COMMIT_ID = sh(
+                      returnStdout: true,
+                      script: "git log -n 1 --pretty=format:'%h'"
+                    ).trim()
+                    TAG = "${params.Name}" + '-' + COMMIT_ID
+                    println "Current branch is ${params.Name}, Commit ID is ${COMMIT_ID}, Image TAG is ${TAG}"
+                  }
             }
           }
         }
-        stage("Deployment to dev"){
-          when { 
-            not {
+      }
+      stage('Building') {
+        when {
+          expression { params.ACTION ==~ /(build|deploy)/ }
+        }
+        steps {
+          container(name: 'jnlp') {
+            sh "java -version"
+            echo "无需编译"
+          }
+        }
+      }
+      stage("Docker build for creating image"){
+        when {
+          expression { params.ACTION ==~ /(build|deploy)/ }
+        }
+        steps {
+          container('nerdctl') {   //指定容器
+            sh '''
+            set +x
+            id && pwd
+            update-ca-certificates
+            nerdctl login -u ${HARBOR_AUTH_USR} -p ${HARBOR_AUTH_PSW}  ${HARBOR_ADDRESS}
+            '''
+            sh "nerdctl build  -t ${HARBOR_ADDRESS}/library/${IMAGE_NAME}:${TAG} ."
+            sh "nerdctl push ${HARBOR_ADDRESS}/library/${IMAGE_NAME}:${TAG}"
+          }
+        }
+      }
+      stage('Deploying to K8s') {
+        when {
+          expression { params.ACTION == 'deploy' }
+        }
+        parallel {
+          stage("Deployment to prod"){
+            when { 
+              beforeInput true
               anyOf {
                 expression { params.Name == 'main' }
                 expression { params.Name == 'master' }
+              } 
+            }
+            input {
+                  message "Deploy to production?"
+                  ok "Yes, we should."
+                  id "simple-input"
+            }
+            steps {
+              container('kubectl') {
+                sh "sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml"   //更新镜像tag
+                sh '''
+                set +x
+                id && pwd
+                PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
+                kubectl get pod
+                kubectl apply -f k8s.yaml
+                '''
               }
-            }    
+            }
           }
-          steps {
-            container('kubectl') {
-              sh "sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml"   //更新镜像tag
-              sh '''
-              set +x
-              id && pwd
-              PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
-              kubectl get pod
-              kubectl apply -f k8s.yaml
-              '''
+          stage("Deployment to dev"){
+            when { 
+              not {
+                anyOf {
+                  expression { params.Name == 'main' }
+                  expression { params.Name == 'master' }
+                }
+              }    
+            }
+            steps {
+              container('kubectl') {
+                sh "sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml"   //更新镜像tag
+                sh '''
+                set +x
+                id && pwd
+                PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
+                kubectl get pod
+                kubectl apply -f k8s.yaml
+                '''
+              }
             }
           }
         }
       }
     }
-
   }
+  // post {    // 通过post + updateGitlabCommitStatus  实现 Publish build status to Gitlab
+  //   success {
+  //     updateGitlabCommitStatus name: 'jenkins', state: 'success'
+  //   }
+  //   failure {
+  //     updateGitlabCommitStatus name: 'jenkins', state: 'failed'
+  //   }
+  // }
 }
