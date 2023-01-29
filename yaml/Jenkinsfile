@@ -105,7 +105,7 @@ pipeline {
         stage("Deployment to prod"){
           when { 
             beforeInput true
-            expression { params.Name ==~ /(main|master)/ } 
+            anyOf { branch 'master'; branch 'main' } }
             }
           input {
                 message "Deploy to production?"
@@ -128,8 +128,8 @@ pipeline {
           when { 
             not {
               anyOf {
-                expression { params.Name != 'main' } 
-                expression { params.Name != 'master' }
+                environment name: 'params.Name', value: 'main'
+                environment name: 'params.Name', value: 'master'
               }
             }    
           }
