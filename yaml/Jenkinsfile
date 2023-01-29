@@ -105,7 +105,7 @@ pipeline {
           id && pwd
           PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
           kubectl get pod
-          cat k8s.yaml
+          kubectl apply -f k8s.yaml
           '''
         }
       }
