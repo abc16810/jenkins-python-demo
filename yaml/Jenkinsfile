@@ -99,12 +99,12 @@ pipeline {
       }
       steps {
         container('kubectl') {
+          sh "sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml"   //更新镜像tag
           sh '''
           set +x
           id && pwd
           PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
           kubectl get pod
-          sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml
           cat k8s.yaml
           '''
         }
