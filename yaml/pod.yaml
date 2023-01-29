@@ -23,6 +23,8 @@ spec:
   - name: kubectl
     image: "myregistry.io:8088/library/kubectl:1.25"
     imagePullPolicy: "IfNotPresent"
+    securityContext:
+      runAsUser: 0
     command:
       - sleep
     args:
