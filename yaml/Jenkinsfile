@@ -99,12 +99,13 @@ pipeline {
       }
       steps {
         container('kubectl') {
-          echo "1111"
           sh '''
           set +x
           id && pwd
           PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
           kubectl get pod
+          sed -i 's/<BUILD_TAGS>/${TAG}/' k8s.yaml
+          cat k8s.yaml
           '''
         }
       }
