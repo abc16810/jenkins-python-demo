@@ -103,11 +103,9 @@ pipeline {
           sh '''
           set +x
           id && pwd
-          sleep 9999
-          echo 1111
+          PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
+          kubect get pod
           '''
-          sh "echo 'hello';"
-          sh "kubectl get pod"
         }
       }
     }
