@@ -104,7 +104,7 @@ pipeline {
           set +x
           id && pwd
           PATH=/opt/bitnami/kubectl/bin:$PATH   # assign path
-          kubect get pod
+          kubectl get pod
           '''
         }
       }
